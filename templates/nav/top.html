@@ -10,11 +10,11 @@
   </div>
   <div id="navbar" class="navbar-collapse collapse">
     <ul class="nav navbar-nav navbar-right" ng-if="!loggedIn">
-      <li><a href="#">Login</a></li>
+      <li><a href="#" ng-click="navigate('home')">Login</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right" ng-if="loggedIn">
-      <li><a href="#" ng-click="navigate('profile')">Profile</a></li>
-      <li ng-if="authorized"><a href="#" ng-click="navigate('settings')">Settings</a></li>
+      <li><a href="#" ng-click="navigate('profile')">Settings</a></li>
+      <li ng-if="authorized"><a href="#" ng-click="navigate('settings')">Admin</a></li>
       <li><a href="#" ng-click="logout()">Logout</a></li>
     </ul>
   </div>

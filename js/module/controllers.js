@@ -5,22 +5,14 @@ angular.module('main.controllers', [])
 	$rootScope.loggedIn = false;
 	$rootScope.uid = "";
 	$rootScope.authorized = false;
-})
-
-.controller('NavCtrl', function($rootScope, $scope, Auth) {
-	$scope.logout = function() {
-		Auth.logout();
-		$rootScope.uid = "";
-		$rootScope.loggedIn = false;
-		$rootScope.authorized = false;
-		$rootScope.module = 'templates/login/login.html';
-	}
 	
-	$scope.navigate = function(loc) {
+	$rootScope.navigate = function(loc) {
 		switch(loc) {
 			case "home":
 				if( $rootScope.loggedIn )
 					$rootScope.module = 'templates/nav/main.html';
+				else
+					$rootScope.module = 'templates/login/login.html';
 				break;
 				
 			case "profile":
@@ -31,6 +23,16 @@ angular.module('main.controllers', [])
 				$rootScope.module = 'templates/login/settings.html';
 				break;
 		}
+	}
+})
+
+.controller('NavCtrl', function($rootScope, $scope, Auth) {
+	$scope.logout = function() {
+		Auth.logout();
+		$rootScope.uid = "";
+		$rootScope.loggedIn = false;
+		$rootScope.authorized = false;
+		$rootScope.navigate('login');
 	}
 })
 
@@ -84,7 +86,7 @@ angular.module('main.controllers', [])
 				alert("Invalid username and/or password!");
 			}
 			else {
-				$rootScope.module = 'templates/nav/main.html';
+				$rootScope.navigate('home');
 				$rootScope.loggedIn = true;
 				$rootScope.uid = val.password.email;
 				$rootScope.authorized = ( authUsers.indexOf($rootScope.uid) != -1 );
