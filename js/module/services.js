@@ -48,6 +48,18 @@ angular.module('main.services', [])
 				console.log(error);
 				alert("An error has occurred. Please try again.");
 			});
+		},
+		createUser: function( email, pass ) {
+			var auth = $firebaseAuth(ref);
+			auth.$createUser({
+				email: email,
+				password: pass
+			}).then( function() {
+				alert("User created successfully!");
+			}).catch( function(error) {
+				console.log(error);
+				alert("An error has occurred. Please contact the system administrator.");
+			});
 		}
 	}
 });

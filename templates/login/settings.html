@@ -2,8 +2,22 @@
 	<h1 class="page-header">Admin</h1>
 	<div class="col-md-8">
 		<h2>Add User</h2>
+		<hr>
+		<div class="col-md-6">
+			<input type="email" class="form-control" placeholder="Email" ng-model="create.email"><br />
+			<input type="password" class="form-control" placeholder="Password" ng-model="create.new"><br />
+			<input type="password" class="form-control" placeholder="Password (confirm)" ng-model="create.newconf"><hr>
+			<button class="btn btn-primary" ng-click="change()">Change Password</button>
+		</div>
 	</div>
 	<div class="col-md-8">
 		<h2>Delete User</h2>
+		<hr>
+		<div class="col-md-6">
+			<input type="password" class="form-control" placeholder="Old Password" ng-model="pass.old"><br />
+			<input type="password" class="form-control" placeholder="New Password" ng-model="pass.new"><br />
+			<input type="password" class="form-control" placeholder="New Password (confirm)" ng-model="pass.newconf"><hr>
+			<button class="btn btn-primary" ng-click="change()">Change Password</button>
+		</div>
 	</div>
 </div>

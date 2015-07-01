@@ -58,7 +58,16 @@ angular.module('main.controllers', [])
 })
 
 .controller('SettingsCtrl', function($scope, $rootScope, Auth) {
+	$scope.create = new Object();
 	
+	$scope.create = function() {
+		if( $scope.create.new != $scope.create.newconf ) {
+			alert("The two passwords don't match!");
+			return;
+		}
+		else
+			Auth.createUser( $scope.create.email, $scope.create.new );
+	}
 })
 
 .controller('LoginCtrl', function($scope, $rootScope, $timeout, Auth) {
