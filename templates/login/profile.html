@@ -1,0 +1,24 @@
+<div ng-controller="ProfileCtrl">
+	<h1 class="page-header">Profile</h1>
+	<div class="col-md-8">
+		<h2>Change Password</h2>
+		<hr>
+		<div class="col-md-6">
+			<input type="password" class="form-control" placeholder="Old Password" ng-model="pass.old"><br />
+			<input type="password" class="form-control" placeholder="New Password" ng-model="pass.new"><br />
+			<input type="password" class="form-control" placeholder="New Password (confirm)" ng-model="pass.newconf"><hr>
+			<button class="btn btn-primary" ng-click="change()">Change Password</button>
+		</div>
+	</div><br />
+	<div class="col-md-8">
+		<h2>Change Email</h2>
+		<hr>
+		<div class="col-md-6">
+			<input type="email" class="form-control" placeholder="Old Email" ng-model="email.old"><br />
+			<input type="email" class="form-control" placeholder="New Email" ng-model="email.new"><br />
+			<input type="email" class="form-control" placeholder="New Email (confirm)" ng-model="email.newconf"><br />
+			<input type="password" class="form-control" placeholder="Password" ng-model="email.pass"><hr>
+			<button class="btn btn-primary" ng-click="changeEmail()">Change Email</button>
+		</div>
+	</div>
+</div>
