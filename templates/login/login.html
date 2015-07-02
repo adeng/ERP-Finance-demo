@@ -40,7 +40,31 @@
 	  border-top-left-radius: 0;
 	  border-top-right-radius: 0;
 	}
+	
+	.form-signin .btn-group {
+		width: 100%;
+	}
+	
+	.form-signin .btn-group .btn-block {
+		width: 50%;
+		margin-top: 0%;
+	}
 </style>
+
+<script type="text/ng-template" id="resetPassword.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Reset Password</h3>
+    </div>
+    <div class="modal-body">
+		<p>Please enter the email for the account whose password you would like to reset</p><br />
+		<label for="inputEmail" class="sr-only">Email address</label>
+		<input type="email" id="inputEmail" required autofocus class="form-control" placeholder="Email address" required autofocus ng-model="resetEmail">
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
 
 <div ng-show="loginfailure">
 	<alert type="danger">Incorrect Username and/or Password!</alert>
@@ -53,5 +77,8 @@
 	<label for="inputPassword" class="sr-only">Password</label>
 	<input type="password" class="form-control" placeholder="Password" required ng-model="login.password">
 	<br />
-	<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="auth()">Sign in</button>
+	<div class="btn-group" id="buttongroup">
+		<button class="btn btn-default btn-block" ng-click="reset()">Forgot Password</button>
+		<button class="btn btn-primary btn-block" type="submit" ng-click="auth()">Sign in</button>
+	</div>
 </form>

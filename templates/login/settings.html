@@ -7,7 +7,7 @@
 			<input type="email" class="form-control" placeholder="Email" ng-model="create.email"><br />
 			<input type="password" class="form-control" placeholder="Password" ng-model="create.new"><br />
 			<input type="password" class="form-control" placeholder="Password (confirm)" ng-model="create.newconf"><hr>
-			<button class="btn btn-primary" ng-click="createUser()">Create User</button>
+			<button class="btn btn-primary" type="submit" ng-click="createUser()">Create User</button>
 		</div>
 	</div>
 	<div class="col-md-8">
@@ -17,7 +17,7 @@
 			<input type="password" class="form-control" placeholder="Old Password" ng-model="pass.old"><br />
 			<input type="password" class="form-control" placeholder="New Password" ng-model="pass.new"><br />
 			<input type="password" class="form-control" placeholder="New Password (confirm)" ng-model="pass.newconf"><hr>
-			<button class="btn btn-danger" ng-click="change()">Delete User</button>
+			<button class="btn btn-danger"type="submit" ng-click="change()">Delete User</button>
 		</div>
 	</div>
 </div>

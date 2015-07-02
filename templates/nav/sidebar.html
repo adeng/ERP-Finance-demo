@@ -1,9 +1,10 @@
-<ul class="nav nav-sidebar"> 
-	<li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
-	<li><a href="#">Revenues</a></li>
-	<li><a href="#">Expenses</a></li>
-	<li><a href="#">Others</a></li>
+<ul class="nav nav-sidebar" ng-controller="SidebarCtrl"> 
+	<li ng-class="{'active': curr == 'overview'}"><a href="#" ng-click="navigate('overview')">Overview <span class="sr-only">(current)</span></a></li>
+	<li ng-class="{'active': curr == 'revenues'}"><a href="#">Revenues</a></li>
+	<li ng-class="{'active': curr == 'expenses'}"><a href="#">Expenses</a></li>
+	<li ng-class="{'active': curr == 'others'}"><a href="#">Others</a></li>
 </ul>
 <ul class="nav nav-sidebar"> 
-	<li><a href="#">Settings</a></li>
+	<li ng-class="{'active': curr == 'profile'}"><a href="#" ng-click="navigate('profile')">Profile</a></li>
+	<li ng-if="authorized" ng-class="{'active': curr == 'settings'}" ng-click="navigate('settings')"><a href="#">Admin</a></li>
 </ul>

@@ -60,6 +60,17 @@ angular.module('main.services', [])
 				console.log(error);
 				alert("An error has occurred. Please contact the system administrator.");
 			});
+		},
+		resetPassword: function( email ) {
+			var auth = $firebaseAuth(ref);
+			auth.$resetPassword({
+				email: email
+			}).then( function() {
+				alert("Password reset email sent successfully!");
+			}).catch( function(error) {
+				console.log(error);
+				alert("An error has occurred. Please contact the system administrator.");
+			});
 		}
 	}
 });
