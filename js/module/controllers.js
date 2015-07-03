@@ -80,6 +80,7 @@ angular.module('main.controllers', [])
 
 .controller('RevenueCtrl', function($scope, Data, Helper) {
 	$scope.rev = new Object();
+	$scope.rev.date = new Date();
 	$scope.maxDate = new Date();
 	
 	$scope.today = function() {
@@ -95,7 +96,17 @@ angular.module('main.controllers', [])
 	});
 	
 	$scope.postRevenue = function() {
+		var trans = new Object();
+		trans.time = $scope.rev.date.getTime();
+		trans.transaction = new Array();
 		
+		trans.transaction[0] = new Object();
+		trans.transaction[0][$scope.rev.debit] = $scope.rev.amount;
+		
+		trans.transaction[1] = new Object();
+		trans.transaction[1][$scope.rev.credit] = -$scope.rev.amount;
+		
+		Data.createTrans(trans);
 	}
 })
 
@@ -119,7 +130,7 @@ angular.module('main.controllers', [])
 	
 	var authUsers = ["albert.deng.927@gmail.com", "summerwang95@gmail.com"];
 	
-	$scope.auth = function() {
+	$scope.auth = function() { /*
 		var request = Auth.login( $scope.login.email, $scope.login.password );
 		request.then( function(val) {
 			if( val == "FAILURE" ) {
@@ -131,7 +142,10 @@ angular.module('main.controllers', [])
 				$rootScope.authorized = ( authUsers.indexOf($rootScope.uid) != -1 );
 				$rootScope.navigate('home');
 			}
-		});
+		}); */
+		
+		$rootScope.loggedIn = true;
+		$rootScope.navigate('home');
 	}
 	
 	$scope.reset = function () {

@@ -83,8 +83,8 @@ angular.module('main.services', [])
 			var timestamp = new Date( Helper.getQuarter(time) );
 			
 		},
-		createTrans: function(debits, credits) {
-			ref.child("transactions").child((new Date()).getTime()).push([debits, credits]);
+		createTrans: function(transaction) {
+			ref.child("transactions").push(transaction);
 		}
 	}
 })

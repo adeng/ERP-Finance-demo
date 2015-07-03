@@ -15,12 +15,12 @@
 	
 	<h4>What did you receive?</h4>
 	<select required class="form-control" ng-model="rev.debit">
-		<option ng-repeat="asset in assets" value="asset[0]">{{asset[1]}}</option>
+		<option ng-repeat="asset in assets" value="{{asset[0]}}">{{asset[1]}}</option>
 	</select><br />
 	
 	<h4>How was it earned?</h4>
 	<select required class="form-control" ng-model="rev.credit">
-		<option ng-repeat="account in accounts" value="account[0]">{{account[1]}}</option>
+		<option ng-repeat="account in accounts" value="{{account[0]}}">{{account[1]}}</option>
 	</select>
 	<hr>
 	<button align="right" class="btn btn-lg btn-primary" type="submit" ng-click="postRevenue()">Submit</button>
