@@ -1,6 +1,27 @@
-<h1 class="post-header">Post Revenue</h1>
-
-<label class="sr-only">How much money was made?</label>
-<input type="number" class="form-control" placeholder="Amount" required ng-model="rev.amount">
-
-<label class="sr-only">How was it made?</label>
+<div ng-controller="RevenueCtrl">
+	<h1 class="page-header">Post Revenue</h1>
+	
+	<h4>When did this transaction occur?</h4>
+	<div style="display:inline-block; min-height:290px;">
+		<datepicker ng-model="rev.date" max-date="maxDate" show-weeks="true" class="well well-sm" style="margin:10px"></datepicker>
+		<button align="right" class="btn btn-block btn-success" type="submit" ng-click="today()">Today</button>
+    </div><br /><br />
+	
+	<h4>How much did you make? (The value of the stuff received)</h4>
+	<div class="input-group">
+		<div class="input-group-addon">$</div>
+		<input type="number" class="form-control" placeholder="Amount" required ng-model="rev.amount" data-toggle="tooltip">
+	</div><br />
+	
+	<h4>What did you receive?</h4>
+	<select required class="form-control" ng-model="rev.debit">
+		<option ng-repeat="asset in assets" value="asset[0]">{{asset[1]}}</option>
+	</select><br />
+	
+	<h4>How was it earned?</h4>
+	<select required class="form-control" ng-model="rev.credit">
+		<option ng-repeat="account in accounts" value="account[0]">{{account[1]}}</option>
+	</select>
+	<hr>
+	<button align="right" class="btn btn-lg btn-primary" type="submit" ng-click="postRevenue()">Submit</button>
+</div>

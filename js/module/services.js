@@ -1,6 +1,7 @@
 angular.module('main.services', [])
 
-.factory('Helper', function() {
+.factory('Helper', function($firebaseObject, $q) {
+	var ref = new Firebase("https://msofinance.firebaseio.com");
 	return {
 		getQuarter: function( time ) {
 			var quarters = ["1/1", "4/1", "7/1", "10/1"]
@@ -9,6 +10,34 @@ angular.module('main.services', [])
 			quarter.setFullYear( time.getFullYear() ); // update year
 			quarter.setDate( quarter.getDate() - 1 ); // adjust back a day
 			return quarter.getTime();
+		},
+		getRevenues: function() {
+			var deferred = $q.defer();
+			var chart = $firebaseObject(ref.child("chart"));
+			chart.$loaded().then( function( val ) {
+				var accounts = new Array();
+				for( var key in val ) {
+					if( key[0] == "5" )
+						accounts.push([key, val[key]]);
+				}
+				
+				deferred.resolve(accounts);
+			});
+			return deferred.promise;
+		},
+		getAssets: function() {
+			var deferred = $q.defer();
+			var chart = $firebaseObject(ref.child("chart"));
+			chart.$loaded().then( function( val ) {
+				var accounts = new Array();
+				for( var key in val ) {
+					if( key[0] == "1" ) 
+						accounts.push([key, val[key]]);
+				}
+				
+				deferred.resolve(accounts);
+			});
+			return deferred.promise;
 		}
 	}
 })
@@ -33,7 +62,7 @@ angular.module('main.services', [])
 			ref.child("hash").set(data);
 		},
 		createChartOfAccounts: function() {
-			var accounts = {1001: "Cash - On Hand", 1002: "Cash - Checking Account", 1003: "Cash - Savings Account", 1011: "Accounts Receivable", 1012: "Allowance for Doubtful Accounts", 1021: "Short-Term Investments", 1022: "Long-Term  nvestments", 1031: "Inventory", 1032: "Valuation Allowance", 1041: "Supplies", 1042: "Prepaid Expenses", 1051: "General Equipment", 1052: "Accumulated Depreciation - General", 1053: "Long-Term Equipment", 1054:  "Accumulated Depreciation - LT", 1061: "Copyrights", 1062: "Amortization - Copyrights", 1063: "Capitalized Intangibles", 1064: "Amortization - Capitalized Intangibles", 1071: "Other Assets", 2001: "Accounts Payable", 2002: "Notes Payable", 2011: "Wages Payable", 2012: "Income Taxes Payable", 2013: "Unearned Revenue", 2021: "Short-Term Debt", 2022: "Current Portion of Long-Term Debt", 2023: "Long-Term Debt", 2031: "Other Liabilities", 3001: "Common Stock", 3002: "Preferred Stock", 3003: "Additional Paid-In Capital", 3004: "Treasury Stock", 3011: "Retained Earnings", 3012: "Accumulated Other Comp Income", 5001: "Fundraiser Revenues", 5002: "Grant Revenues", 5003: "Event Revenues", 5004: "Sales Revenues", 5005: "Investment Revenues", 5091: "Miscellaneous Revenues", 6001: "Cost of Goods Sold", 6002: "Marketing/Advertising Expenses", 6003:  "Administrative Expenses", 6011: "Transaction Expenses", 6012: "Parking Expenses", 6013: "Catering/Food Expenses", 6014: "Rent/Venues Expenses", 6015: "Transportation Expenses", 6016: "Gift Expenses", 6021: "Supplies  xpenses", 6022: "Depreciation Expense", 6023: "Bad Debt Expense", 6091: "Miscellaneous Expenses", 9001: "Gains", 9002: "Losses"}
+			var accounts = {1001: "Cash - On Hand", 1002: "Cash - Checking Account", 1003: "Cash - Savings Account", 1011: "Accounts Receivable", 1012: "Allowance for Doubtful Accounts", 1021: "Short-Term Investments", 1022: "Long-Term  nvestments", 1031: "Inventory", 1032: "Valuation Allowance", 1041: "Supplies", 1042: "Prepaid Expenses", 1051: "General Equipment", 1052: "Accumulated Depreciation - General", 1053: "Long-Term Equipment", 1054:  "Accumulated Depreciation - LT", 1061: "Copyrights", 1062: "Amortization - Copyrights", 1063: "Capitalized Intangibles", 1064: "Amortization - Capitalized Intangibles", 1071: "Other Assets", 2001: "Accounts Payable", 2002: "Notes Payable", 2011: "Wages Payable", 2012: "Income Taxes Payable", 2013: "Unearned Revenue", 2021: "Short-Term Debt", 2022: "Current Portion of Long-Term Debt", 2023: "Long-Term Debt", 2031: "Other Liabilities", 3001: "Common Stock", 3002: "Preferred Stock", 3003: "Additional Paid-In Capital", 3004: "Treasury Stock", 3011: "Retained Earnings", 3012: "Accumulated Other Comp Income", 5001: "Fundraiser Revenues", 5002: "Grant Revenues", 5003: "Event Revenues", 5004: "Sales Revenues", 5005: "Investment Revenues", 5006: "Gift Revenues", 5091: "Miscellaneous Revenues", 6001: "Cost of Goods Sold", 6002: "Marketing/Advertising Expenses", 6003:  "Administrative Expenses", 6011: "Transaction Expenses", 6012: "Parking Expenses", 6013: "Catering/Food Expenses", 6014: "Rent/Venues Expenses", 6015: "Transportation Expenses", 6016: "Gift Expenses", 6021: "Supplies  xpenses", 6022: "Depreciation Expense", 6023: "Bad Debt Expense", 6091: "Miscellaneous Expenses", 9001: "Gains", 9002: "Losses"}
 			
 			ref.child("chart").set(accounts);
 		},
@@ -51,8 +80,8 @@ angular.module('main.services', [])
 			});
 		},
 		genRecord: function( time ) {
-			var d = new Date(time);
-				
+			var timestamp = new Date( Helper.getQuarter(time) );
+			
 		},
 		createTrans: function(debits, credits) {
 			ref.child("transactions").child((new Date()).getTime()).push([debits, credits]);

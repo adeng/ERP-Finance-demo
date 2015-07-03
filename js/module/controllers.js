@@ -1,18 +1,21 @@
 angular.module('main.controllers', [])
 
-.controller('MainCtrl', function($rootScope, Data) {
+.controller('MainCtrl', function($rootScope, Data, Helper) {
 	$rootScope.module = 'templates/login/login.html';
 	$rootScope.loggedIn = false;
 	$rootScope.uid = "";
 	$rootScope.authorized = false;
 	$rootScope.curr = 'overview';
 	
-	
+	Data.createChartOfAccounts();
 	
 	$rootScope.navigate = function(loc) {
+		if( !$rootScope.loggedIn && loc != "home" ) {
+			return;
+		}
+		
 		switch(loc) {
 			case "home":
-				console.log($rootScope.loggedIn);
 				if( $rootScope.loggedIn )
 					$rootScope.module = 'templates/nav/main.html';
 				else
@@ -28,6 +31,11 @@ angular.module('main.controllers', [])
 			case "settings":
 				$rootScope.module = 'templates/login/settings.html';
 				$rootScope.curr = 'admin';
+				break;
+				
+			case "posting":
+				$rootScope.module = 'templates/posting/revenue.html';
+				$rootScope.curr = 'revenues';
 				break;
 		}
 	}
@@ -67,6 +75,27 @@ angular.module('main.controllers', [])
 		}
 		else
 			Auth.changeEmail( $rootScope.uid, $scope.email.new, $scope.email.pass );
+	}
+})
+
+.controller('RevenueCtrl', function($scope, Data, Helper) {
+	$scope.rev = new Object();
+	$scope.maxDate = new Date();
+	
+	$scope.today = function() {
+		$scope.rev.date = new Date();
+	}
+	
+	Helper.getRevenues().then( function( val ) {
+	 	$scope.accounts = val;
+	});
+	
+	Helper.getAssets().then( function( val ) {
+		$scope.assets = val;
+	});
+	
+	$scope.postRevenue = function() {
+		
 	}
 })
 
