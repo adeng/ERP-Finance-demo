@@ -1,11 +1,13 @@
 angular.module('main.controllers', [])
 
-.controller('MainCtrl', function($rootScope) {
+.controller('MainCtrl', function($rootScope, Data) {
 	$rootScope.module = 'templates/login/login.html';
 	$rootScope.loggedIn = false;
 	$rootScope.uid = "";
 	$rootScope.authorized = false;
 	$rootScope.curr = 'overview';
+	
+	
 	
 	$rootScope.navigate = function(loc) {
 		switch(loc) {
