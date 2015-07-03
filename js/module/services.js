@@ -7,7 +7,7 @@ angular.module('main.services', [])
 			var quarters = ["1/1", "4/1", "7/1", "10/1"]
 			var d = new Date(time);
 			var quarter = new Date( quarters[Math.floor(d.getMonth()/4)] );
-			quarter.setFullYear( time.getFullYear() ); // update year
+			quarter.setFullYear( d.getFullYear() ); // update year
 			quarter.setDate( quarter.getDate() - 1 ); // adjust back a day
 			return quarter.getTime();
 		},
@@ -76,7 +76,7 @@ angular.module('main.services', [])
 						record[key] = 0;
 				}
 				
-				ref.child("snapshots").child((new Date("12/31/14")).getTime()).set(record); 
+				ref.child("snapshots").child((new Date("3/31/15")).getTime()).set(record); 
 			});
 		},
 		genRecord: function( time ) {
@@ -84,7 +84,66 @@ angular.module('main.services', [])
 			
 		},
 		createTrans: function(transaction) {
-			ref.child("transactions").push(transaction);
+			ref.child("transactions").push(transaction, function( result ) {
+				if( result == null )
+					alert("Transaction posted successfully!");
+				else
+					alert(result);
+			});
+		}
+	}
+})
+
+.factory('Reporting', function($firebaseObject, Helper) {
+	var ref = new Firebase("https://msofinance.firebaseio.com");
+	
+	return {
+		genLatestQuarter: function() {
+			var lastQ = new Date( Helper.getQuarter( (new Date).getTime()) );
+			var oldestQ = new Date( Helper.getQuarter( lastQ.setDate( lastQ.getDate() - 10 )));
+			
+			var chart = $firebaseObject(ref.child("chart"));
+			var record = new Object();
+			
+			var transactions = ref.child("transactions").orderByChild("time").startAt(oldestQ.getTime()).endAt(lastQ.getTime());
+			var lastSnap = $firebaseObject(ref.child("snapshots").child(oldestQ.getTime()));
+			
+			chart.$loaded().then( function( val ) {	
+				for( var extra in val ) {
+					if( !isNaN(parseInt(extra)) )
+						record[extra] = 0;
+				}
+				console.log(record);
+				
+				lastSnap.$loaded().then( function( snap ) {
+
+					// ensure new accounts are added properly
+					for( var key in snap ) {
+						if( !isNaN(parseInt(key)) )
+							record[key] = snap[key];
+					}
+					
+					transactions.once('value', function( dataSnapshot ) {
+						dataSnapshot.forEach( function(data) {
+							var transaction = data.val()['transaction'];
+							
+							// debits
+							for( var debit in transaction[0] ) {
+								record[debit] += transaction[0][debit];
+							}
+							
+							// credits
+							for( var credit in transaction[1] ) {
+								record[credit] += transaction[1][credit];
+							}
+						});
+						
+						console.log(record);
+						
+						ref.child("snapshots").child(lastQ.getTime()).set(record);
+					});
+				});
+			});
 		}
 	}
 })

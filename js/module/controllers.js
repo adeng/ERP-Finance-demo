@@ -1,13 +1,13 @@
 angular.module('main.controllers', [])
 
-.controller('MainCtrl', function($rootScope, Data, Helper) {
+.controller('MainCtrl', function($rootScope, Data, Helper, Reporting) {
 	$rootScope.module = 'templates/login/login.html';
 	$rootScope.loggedIn = false;
 	$rootScope.uid = "";
 	$rootScope.authorized = false;
 	$rootScope.curr = 'overview';
 	
-	Data.createChartOfAccounts();
+	Reporting.genLatestQuarter();
 	
 	$rootScope.navigate = function(loc) {
 		if( !$rootScope.loggedIn && loc != "home" ) {
