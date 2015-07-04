@@ -118,29 +118,35 @@ angular.module('main.controllers', [])
 })
 
 .controller('TrialBalanceCtrl', function($scope, $rootScope, Helper, Reporting, Fetch) {
-	Reporting.genQuarter( (new Date()).getTime() );
-	
-	
-	$scope.quarter = Helper.getQuarter( (new Date()).getTime() );
-	Fetch.getSnapshot( $scope.quarter ).then( function(val) {
-		$scope.glcodes = new Array();
-		$scope.amounts = new Array();
-		Fetch.getGLCodes().then( function(codes) {
-			$scope.codes = codes;
-		});
-		
-		for( var key in val )
-		{
-			for( var gl in val[key] ) {
-				console.log(val[key][gl]);
-				$scope.glcodes.push(gl);
-				if( gl[0] == "2" || gl[0] == "3" || gl[0] == "5" || gl == "9001" )
-					$scope.amounts.push(-1 * parseInt(val[key][gl]));
-				else
-					$scope.amounts.push(parseInt(val[key][gl]));
+	$scope.now = new Date().getTime();
+	$scope.curr = 0;
+	$scope.init = function( time, stamp ) {
+		$scope.curr = stamp;
+		Fetch.getSnapshot( time ).then( function(val) {
+			$scope.glcodes = new Array();
+			$scope.amounts = new Array();
+			Fetch.getGLCodes().then( function(codes) {
+				$scope.codes = codes;
+			});
+			
+			for( var key in val )
+			{
+				for( var gl in val[key] ) {
+					$scope.glcodes.push(gl);
+					if( gl[0] == "2" || gl[0] == "3" || gl[0] == "5" || gl == "9001" )
+						$scope.amounts.push(-1 * parseInt(val[key][gl]));
+					else
+						$scope.amounts.push(parseInt(val[key][gl]));
+				}
 			}
-		}
-	});
+		});
+	}
+	
+	$scope.init( (new Date()).getTime() );
+	var q1 = new Date();
+	var q2 = new Date(); q2.setMonth(q2.getMonth() - 3);
+	var q3 = new Date(); q3.setMonth(q3.getMonth() - 6);
+	$scope.quarters = [ Helper.getQuarter( q1.getTime() ), Helper.getQuarter( q2.getTime() ), Helper.getQuarter( q3.getTime() ) ];
 })
 
 .controller('SettingsCtrl', function($scope, $rootScope, Auth) {

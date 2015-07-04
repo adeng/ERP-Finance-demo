@@ -1,12 +1,31 @@
+<style>
+	.tbalance th:nth-child(1) {
+		width: 10%;
+	}
+	
+	.tbalance th:nth-child(2) {
+		width: 75%;
+	}
+	
+	.tbalance th:nth-child(3) {
+		width: 15%;
+	}
+</style>
+
 <div ng-controller="TrialBalanceCtrl">
 	<h1 class="page-header">Trial Balance</h1>
 	
-	<table class="table table-hover">
+	<ul class="nav nav-tabs">
+		<li role="presentation" ng-class="{'active': curr == '0'}" ng-click="init(now, 0)"><a href="#">Current Period QTD</a></li>
+		<li role="presentation" ng-class="{'active': curr == ($index + 1)}" ng-repeat="quarter in quarters" ng-click="init(quarter, $index + 1)"><a href="#">{{toDateString(quarter)}}</a></li>
+	</ul><br />
+	
+	<table class="table table-hover tbalance">
 		<thead>
 			<tr>
 				<th>GL Code</th>
 				<th>Account Name</th>
-				<th>{{toDateString(quarter)}}</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>

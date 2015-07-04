@@ -56,7 +56,6 @@ angular.module('main.services', [])
 				var data = dataSnapshot.val();
 				if( data == null ) {
 					Reporting.genOnTime( time ).then( function(val) {
-						console.log(val);
 						deferred.resolve(val);
 					});
 				}
