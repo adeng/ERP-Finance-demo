@@ -1,13 +1,15 @@
 angular.module('main.controllers', [])
 
-.controller('MainCtrl', function($rootScope, Data, Helper, Reporting) {
+.controller('MainCtrl', function($rootScope, Data, Helper, Reporting, Fetch) {
 	$rootScope.module = 'templates/login/login.html';
 	$rootScope.loggedIn = false;
 	$rootScope.uid = "";
 	$rootScope.authorized = false;
 	$rootScope.curr = 'overview';
 	
-	Reporting.genLatestQuarter();
+	$rootScope.toDateString = function( date ) {
+		return (new Date(date)).toDateString();
+	}
 	
 	$rootScope.navigate = function(loc) {
 		if( !$rootScope.loggedIn && loc != "home" ) {
@@ -36,6 +38,11 @@ angular.module('main.controllers', [])
 			case "posting":
 				$rootScope.module = 'templates/posting/revenue.html';
 				$rootScope.curr = 'revenues';
+				break;
+				
+			case "reports":
+				$rootScope.module = 'templates/reports/trial.html';
+				$rootScope.curr = "reports";
 				break;
 		}
 	}
@@ -108,6 +115,32 @@ angular.module('main.controllers', [])
 		
 		Data.createTrans(trans);
 	}
+})
+
+.controller('TrialBalanceCtrl', function($scope, $rootScope, Helper, Reporting, Fetch) {
+	Reporting.genQuarter( (new Date()).getTime() );
+	
+	
+	$scope.quarter = Helper.getQuarter( (new Date()).getTime() );
+	Fetch.getSnapshot( $scope.quarter ).then( function(val) {
+		$scope.glcodes = new Array();
+		$scope.amounts = new Array();
+		Fetch.getGLCodes().then( function(codes) {
+			$scope.codes = codes;
+		});
+		
+		for( var key in val )
+		{
+			for( var gl in val[key] ) {
+				console.log(val[key][gl]);
+				$scope.glcodes.push(gl);
+				if( gl[0] == "2" || gl[0] == "3" || gl[0] == "5" || gl == "9001" )
+					$scope.amounts.push(-1 * parseInt(val[key][gl]));
+				else
+					$scope.amounts.push(parseInt(val[key][gl]));
+			}
+		}
+	});
 })
 
 .controller('SettingsCtrl', function($scope, $rootScope, Auth) {

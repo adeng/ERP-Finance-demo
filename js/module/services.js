@@ -6,10 +6,14 @@ angular.module('main.services', [])
 		getQuarter: function( time ) {
 			var quarters = ["1/1", "4/1", "7/1", "10/1"]
 			var d = new Date(time);
-			var quarter = new Date( quarters[Math.floor(d.getMonth()/4)] );
+			var quarter = new Date( quarters[Math.floor(d.getMonth()/3)] );
 			quarter.setFullYear( d.getFullYear() ); // update year
 			quarter.setDate( quarter.getDate() - 1 ); // adjust back a day
 			return quarter.getTime();
+		},
+		getFiscalYear: function( time ) {
+			var d = new Date(time);
+			return (new Date("12/31").setFullYear(d.getFullYear() - 1)).getTime();	
 		},
 		getRevenues: function() {
 			var deferred = $q.defer();
@@ -42,7 +46,38 @@ angular.module('main.services', [])
 	}
 })
 
-.factory('Data', function($firebaseArray, $firebaseObject, Helper) {
+.factory('Fetch', function($firebaseObject, $q, Reporting) {
+	var ref = new Firebase("https://msofinance.firebaseio.com");
+	
+	return {
+		getSnapshot: function( time ) {
+			var deferred = $q.defer();
+			ref.child("snapshots").orderByKey().equalTo( (new Date(time)).getTime().toString() ).once('value', function( dataSnapshot ) {
+				var data = dataSnapshot.val();
+				if( data == null ) {
+					Reporting.genOnTime( time ).then( function(val) {
+						console.log(val);
+						deferred.resolve(val);
+					});
+				}
+				else
+					deferred.resolve(data);
+			});
+			
+			return deferred.promise;
+		},
+		getGLCodes: function() {
+			var deferred = $q.defer();
+			var fbObj = $firebaseObject(ref.child("chart"));
+			fbObj.$loaded().then( function(val) { 
+				deferred.resolve(val);
+			});
+			return deferred.promise;
+		}
+	}
+})
+
+.factory('Data', function($firebaseArray, $firebaseObject, Helper, Reporting) {
 	var ref = new Firebase("https://msofinance.firebaseio.com");
 	
 	return {
@@ -76,12 +111,8 @@ angular.module('main.services', [])
 						record[key] = 0;
 				}
 				
-				ref.child("snapshots").child((new Date("3/31/15")).getTime()).set(record); 
+				ref.child("snapshots").child((new Date("6/30/15")).getTime()).set(record); 
 			});
-		},
-		genRecord: function( time ) {
-			var timestamp = new Date( Helper.getQuarter(time) );
-			
 		},
 		createTrans: function(transaction) {
 			ref.child("transactions").push(transaction, function( result ) {
@@ -94,13 +125,14 @@ angular.module('main.services', [])
 	}
 })
 
-.factory('Reporting', function($firebaseObject, Helper) {
+.factory('Reporting', function($firebaseObject, $q, Helper) {
 	var ref = new Firebase("https://msofinance.firebaseio.com");
 	
 	return {
-		genLatestQuarter: function() {
-			var lastQ = new Date( Helper.getQuarter( (new Date).getTime()) );
-			var oldestQ = new Date( Helper.getQuarter( lastQ.setDate( lastQ.getDate() - 10 )));
+		genQuarter: function( time ) {
+			var deferred = $q.defer();
+			var lastQ = new Date( Helper.getQuarter( (new Date).getTime(time)) );
+			var oldestQ = new Date( Helper.getQuarter( new Date(lastQ.getTime()).setDate( lastQ.getDate() - 10 )));
 			
 			var chart = $firebaseObject(ref.child("chart"));
 			var record = new Object();
@@ -113,7 +145,6 @@ angular.module('main.services', [])
 					if( !isNaN(parseInt(extra)) )
 						record[extra] = 0;
 				}
-				console.log(record);
 				
 				lastSnap.$loaded().then( function( snap ) {
 
@@ -124,26 +155,87 @@ angular.module('main.services', [])
 					}
 					
 					transactions.once('value', function( dataSnapshot ) {
+						var equity = 0;
 						dataSnapshot.forEach( function(data) {
 							var transaction = data.val()['transaction'];
 							
 							// debits
 							for( var debit in transaction[0] ) {
 								record[debit] += transaction[0][debit];
+								if( debit[0] == "6" || debit[0] == "9" )
+									equity += transaction[0][debit];
 							}
 							
 							// credits
 							for( var credit in transaction[1] ) {
 								record[credit] += transaction[1][credit];
+								if( credit[0] == "5" || credit[0] == "9" )
+									equity += transaction[1][credit];
 							}
 						});
 						
-						console.log(record);
+						record['3011'] += equity;
 						
 						ref.child("snapshots").child(lastQ.getTime()).set(record);
+						deferred.resolve(record);
 					});
 				});
 			});
+			
+			return deferred.promise;
+		},
+		genOnTime: function( time ) {
+			var deferred = $q.defer();
+			var lastQ = new Date( time );
+			var oldestQ = new Date( Helper.getQuarter( (new Date(time)).getTime()));
+			console.log(oldestQ.toLocaleString());
+			
+			var chart = $firebaseObject(ref.child("chart"));
+			var record = new Object();
+			
+			var transactions = ref.child("transactions").orderByChild("time").startAt(oldestQ.getTime()).endAt(lastQ.getTime());
+			var lastSnap = $firebaseObject(ref.child("snapshots").child(oldestQ.getTime()));
+			
+			chart.$loaded().then( function( val ) {	
+				for( var extra in val ) {
+					if( !isNaN(parseInt(extra)) )
+						record[extra] = 0;
+				}
+				
+				lastSnap.$loaded().then( function( snap ) {
+					// ensure new accounts are added properly
+					for( var key in snap ) {
+						if( !isNaN(parseInt(key)) )
+							record[key] = snap[key];
+					}
+					
+					transactions.once('value', function( dataSnapshot ) {
+						var equity = 0;
+						dataSnapshot.forEach( function(data) {
+							var transaction = data.val()['transaction'];
+							
+							// debits
+							for( var debit in transaction[0] ) {
+								record[debit] += transaction[0][debit];
+								if( debit[0] == "6" || debit[0] == "9" )
+									equity += transaction[0][debit];
+							}
+							
+							// credits
+							for( var credit in transaction[1] ) {
+								record[credit] += transaction[1][credit];
+								if( credit[0] == "5" || credit[0] == "9" )
+									equity += transaction[1][credit];
+							}
+						});
+						
+						record['3011'] += equity;
+						deferred.resolve(record);
+					});
+				});
+			});
+			
+			return deferred.promise;
 		}
 	}
 })
