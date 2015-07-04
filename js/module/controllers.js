@@ -119,7 +119,6 @@ angular.module('main.controllers', [])
 
 .controller('TrialBalanceCtrl', function($scope, $rootScope, Helper, Reporting, Fetch) {
 	$scope.now = new Date().getTime();
-	$scope.curr = 0;
 	$scope.init = function( time, stamp ) {
 		$scope.curr = stamp;
 		Fetch.getSnapshot( time ).then( function(val) {
@@ -132,6 +131,7 @@ angular.module('main.controllers', [])
 			for( var key in val )
 			{
 				for( var gl in val[key] ) {
+					console.log(gl);
 					$scope.glcodes.push(gl);
 					if( gl[0] == "2" || gl[0] == "3" || gl[0] == "5" || gl == "9001" )
 						$scope.amounts.push(-1 * parseInt(val[key][gl]));
@@ -143,6 +143,7 @@ angular.module('main.controllers', [])
 	}
 	
 	$scope.init( (new Date()).getTime() );
+	$scope.curr = 0;
 	var q1 = new Date();
 	var q2 = new Date(); q2.setMonth(q2.getMonth() - 3);
 	var q3 = new Date(); q3.setMonth(q3.getMonth() - 6);

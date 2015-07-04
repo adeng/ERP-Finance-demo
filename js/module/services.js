@@ -56,13 +56,13 @@ angular.module('main.services', [])
 				var data = dataSnapshot.val();
 				if( data == null ) {
 					Reporting.genOnTime( time ).then( function(val) {
-						deferred.resolve(val);
-					});
+						deferred.resolve({time: val});
+					});					
 				}
 				else
 					deferred.resolve(data);
 			});
-			
+
 			return deferred.promise;
 		},
 		getGLCodes: function() {
@@ -174,9 +174,9 @@ angular.module('main.services', [])
 						});
 						
 						record['3011'] += equity;
+						deferred.resolve(record);
 						
 						ref.child("snapshots").child(lastQ.getTime()).set(record);
-						deferred.resolve(record);
 					});
 				});
 			});
@@ -187,11 +187,10 @@ angular.module('main.services', [])
 			var deferred = $q.defer();
 			var lastQ = new Date( time );
 			var oldestQ = new Date( Helper.getQuarter( (new Date(time)).getTime()));
-			console.log(oldestQ.toLocaleString());
 			
 			var chart = $firebaseObject(ref.child("chart"));
 			var record = new Object();
-			
+						
 			var transactions = ref.child("transactions").orderByChild("time").startAt(oldestQ.getTime()).endAt(lastQ.getTime());
 			var lastSnap = $firebaseObject(ref.child("snapshots").child(oldestQ.getTime()));
 			
@@ -226,6 +225,7 @@ angular.module('main.services', [])
 								if( credit[0] == "5" || credit[0] == "9" )
 									equity += transaction[1][credit];
 							}
+							
 						});
 						
 						record['3011'] += equity;
