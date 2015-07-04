@@ -19,7 +19,7 @@ angular.module('main.controllers', [])
 		switch(loc) {
 			case "home":
 				if( $rootScope.loggedIn )
-					$rootScope.module = 'templates/nav/main.html';
+					$rootScope.module = 'templates/nav/landing.html';
 				else
 					$rootScope.module = 'templates/login/login.html';
 				$rootScope.curr = 'overview';
