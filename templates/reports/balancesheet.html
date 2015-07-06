@@ -1,0 +1,106 @@
+<style>
+	.tsheet th:nth-child(1) {
+		width: 90%;
+	}
+	
+	.tsheet th:nth-child(2) {
+		width: 10%;
+	}
+	
+	.tinline td:first-child {
+		padding-left: 2.5vw;
+	}
+</style>
+
+<div ng-controller="BalanceSheetCtrl">
+	<ol class="breadcrumb">
+		<li><a href="#" ng-click="navigate('home')">Home</a></li>
+		<li><a href="#" ng-click="navigate('reporting')">Reporting</a></li>
+		<li class="active">Balance Sheet</li>
+	</ol><br />
+	
+	<h1 class="page-header">Balance Sheet</h1>
+	
+	<ul class="nav nav-tabs">
+		<li role="presentation" ng-class="{'active': curr == '0'}" ng-click="init(now, 0)"><a href="#">Current Period QTD</a></li>
+		<li role="presentation" ng-class="{'active': curr == ($index + 1)}" ng-repeat="quarter in quarters" ng-click="init(quarter, $index + 1)"><a href="#">{{toDateString(quarter)}}</a></li>
+	</ul><br />
+	
+	<table class="table table-hover tsheet">
+		<thead>
+			<tr>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-if="curAssets.length > 0">
+				<th><b>Current Assets</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="ca in curAssets" ng-if="curAssets.length > 0" class="tinline">
+				<td>{{codes[ca.desc]}}</td>
+				<td>{{ca.amount}}</td>
+			</tr>
+			<tr ng-if="nonAssets.length > 0">
+				<th><b>Non-Current Assets</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="na in nonAssets" ng-if="nonAssets.length > 0" class="tinline">
+				<td>{{codes[na.desc]}}</td>
+				<td>{{na.amount}}</td>
+			</tr>
+			<tr>
+				<th><b>Total Assets</b></th>
+				<th>{{totalAssets}}</th>
+			</tr>
+		</tbody>
+	</table>
+	
+	<table class="table table-hover tsheet">
+		<thead>
+			<tr>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-if="curLiabilities.length > 0">
+				<th><b>Current Liabilities</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="cl in curLiabilities" ng-if="curLiabilities.length > 0" class="tinline">
+				<td>{{codes[cl.desc]}}</td>
+				<td>{{cl.amount}}</td>
+			</tr>
+			<tr ng-if="nonLiabilities.length > 0">
+				<th><b>Non-Current Assets</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="nl in nonLiabilities" ng-if="nonLiabilities.length > 0" class="tinline">
+				<td>{{codes[nl.desc]}}</td>
+				<td>{{nl.amount}}</td>
+			</tr>
+			<tr>
+				<th><b>Total Liabilities</b></th>
+				<th>{{totalLiabilities}}</th>
+			</tr>
+			<tr ng-if="equity.length > 0">
+				<th><b>Equity</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="eq in equity" ng-if="equity.length > 0" class="tinline">
+				<td>{{codes[eq.desc]}}</td>
+				<td>{{eq.amount}}</td>
+			</tr>
+			<tr>
+				<th><b>Total Equity</b></th>
+				<th>{{totalEquity}}</th>
+			</tr>
+			<tr>
+				<th><b>Total Liabilities and Equity</b></th>
+				<th>{{totalLiabilitiesEquity}}</th>
+			</tr>
+		</tbody>
+	</table>
+</div>

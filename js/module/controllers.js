@@ -19,7 +19,7 @@ angular.module('main.controllers', [])
 		switch(loc) {
 			case "home":
 				if( $rootScope.loggedIn )
-					$rootScope.module = 'templates/nav/landing.html';
+					$rootScope.module = 'templates/nav/home.html';
 				else
 					$rootScope.module = 'templates/login/login.html';
 				$rootScope.curr = 'overview';
@@ -36,12 +36,27 @@ angular.module('main.controllers', [])
 				break;
 				
 			case "posting":
-				$rootScope.module = 'templates/posting/revenue.html';
+				$rootScope.module = 'templates/posting/postrevenue.html';
 				$rootScope.curr = 'revenues';
 				break;
 				
-			case "reports":
-				$rootScope.module = 'templates/reports/trial.html';
+			case "trial":
+				$rootScope.module = 'templates/reports/trialbalance.html';
+				$rootScope.curr = "reports";
+				break;
+				
+			case "incomestatement":
+				$rootScope.module = 'templates/reports/incomestatement.html';
+				$rootScope.curr = "reports";
+				break;
+				
+			case "balancesheet":
+				$rootScope.module = 'templates/reports/balancesheet.html';
+				$rootScope.curr = "reports";
+				break;
+				
+			case "reporting":
+				$rootScope.module = 'templates/reports/reporting.html';
 				$rootScope.curr = "reports";
 				break;
 		}
@@ -85,7 +100,7 @@ angular.module('main.controllers', [])
 	}
 })
 
-.controller('RevenueCtrl', function($scope, Data, Helper) {
+.controller('PostRevenueCtrl', function($scope, Data, Helper) {
 	$scope.rev = new Object();
 	$scope.rev.date = new Date();
 	$scope.maxDate = new Date();
@@ -117,6 +132,145 @@ angular.module('main.controllers', [])
 	}
 })
 
+.controller('ReportingCtrl', function($scope, $rootScope) {
+	
+})
+
+.controller('BalanceSheetCtrl', function($scope, $rootScope, Fetch, Helper) {
+	$scope.now = new Date().getTime();
+	$scope.init = function( time, stamp ) {	
+		$scope.curAssets = new Array();
+		$scope.nonAssets = new Array();
+		$scope.curLiabilities = new Array();
+		$scope.nonLiabilities = new Array();
+		$scope.equity = new Array();
+		$scope.totalAssets = 0;
+		$scope.totalLiabilities = 0;
+		$scope.totalEquity = 0;
+		$scope.totalLiabilitiesEquity = 0;
+			
+		$scope.curr = stamp;
+		Fetch.getSnapshot( time ).then( function(val) {
+			$scope.glcodes = new Array();
+			$scope.amounts = new Array();
+			Fetch.getGLCodes().then( function(codes) {
+				$scope.codes = codes;
+			});
+			
+			for( var key in val )
+			{
+				for( var gl in val[key] ) {
+					if( parseInt( gl[0] ) > 3 || parseInt(val[key][gl]) == 0)
+						continue;
+					var amount = ( parseInt(gl[0]) > 1 ) ? -1 * parseInt(val[key][gl]) : parseInt(val[key][gl]);
+					switch( gl[0] ) {
+						// Assets
+						case "1":
+							if( parseInt( gl.substr(0, 3)) < 104 )
+								$scope.curAssets.push({ desc: gl, amount: Helper.accountify(amount) });
+							else
+								$scope.nonAssets.push({ desc: gl, amount: Helper.accountify(amount) });
+							$scope.totalAssets += amount;
+							break;
+							
+						// Liabilities
+						case "2":
+							if( parseInt( gl.substr(0, 3)) < 201 )
+								$scope.curLiabilities.push({ desc: gl, amount: Helper.accountify(amount) });
+							else
+								$scope.nonLiabilities.push({ desc: gl, amount: Helper.accountify(amount) });
+							$scope.totalLiabilities += amount;
+							break;
+						
+						// Equity
+						case "3":
+							$scope.equity.push({ desc: gl, amount: Helper.accountify(amount) });
+							$scope.totalEquity += amount;
+							break;
+					}
+				}
+			}
+			
+			$scope.totalAssets = Helper.accountify($scope.totalAssets);
+			$scope.totalLiabilitiesEquity = Helper.accountify($scope.totalLiabilities + $scope.totalEquity);
+			$scope.totalLiabilities = Helper.accountify($scope.totalLiabilities);
+			$scope.totalEquity = Helper.accountify($scope.totalEquity);
+		});
+	}
+	
+	$scope.init( (new Date()).getTime() );
+	$scope.curr = 0;
+	var q1 = new Date();
+	var q2 = new Date(); q2.setMonth(q2.getMonth() - 3);
+	var q3 = new Date(); q3.setMonth(q3.getMonth() - 6);
+	$scope.quarters = [ Helper.getQuarter( q1.getTime() ), Helper.getQuarter( q2.getTime() ), Helper.getQuarter( q3.getTime() ) ];
+})
+
+.controller('IncomeStatementCtrl', function($scope, $rootScope, Fetch, Helper) {	
+	$scope.now = new Date().getTime();
+	$scope.init = function( time, stamp ) {
+		$scope.revenues = new Array();
+		$scope.expenses = new Array();
+		$scope.others = new Array();
+		$scope.incomeBeforeTax = 0;
+		$scope.tax = 0;
+		
+		$scope.curr = stamp;
+		Fetch.getSnapshot( time ).then( function(val) {
+			$scope.glcodes = new Array();
+			$scope.amounts = new Array();
+			Fetch.getGLCodes().then( function(codes) {
+				$scope.codes = codes;
+			});
+			
+			for( var key in val )
+			{
+				for( var gl in val[key] ) {
+					if( parseInt( gl[0] ) < 5 || parseInt(val[key][gl]) == 0)
+						continue;
+					var amount = -1 * parseInt(val[key][gl]);
+					$scope.incomeBeforeTax += amount;
+					switch( gl[0] ) {
+						// Revenues
+						case "5":
+							if( parseInt( gl.substr(0, 3)) == 500 )
+								$scope.revenues.push({ desc: gl, amount: Helper.accountify(amount) });
+							else
+								$scope.others.push({ desc: gl, amount: Helper.accountify(amount) });
+							break;
+							
+						// Expenses
+						case "6":
+							if( parseInt( gl.substr(0, 3)) == 600 )
+								$scope.expenses.push({ desc: gl, amount: Helper.accountify(amount) });
+							else
+								$scope.others.push({ desc: gl, amount: Helper.accountify(amount) });
+							break;
+						
+						// Gains/Losses
+						case "9":
+							$scope.others.push({ desc: gl, amount: Helper.accountify(amount) });
+							break;
+					}
+				}
+				$scope.tax = 0; // adjust for tax rate later
+				$scope.netIncome = Helper.accountify($scope.incomeBeforeTax - $scope.tax);
+				
+				// Accountify the rest
+				$scope.incomeBeforeTax = Helper.accountify($scope.incomeBeforeTax);
+				$scope.tax = Helper.accountify($scope.tax);
+			}
+		});
+	}
+	
+	$scope.init( (new Date()).getTime() );
+	$scope.curr = 0;
+	var q1 = new Date();
+	var q2 = new Date(); q2.setMonth(q2.getMonth() - 3);
+	var q3 = new Date(); q3.setMonth(q3.getMonth() - 6);
+	$scope.quarters = [ Helper.getQuarter( q1.getTime() ), Helper.getQuarter( q2.getTime() ), Helper.getQuarter( q3.getTime() ) ];
+})
+
 .controller('TrialBalanceCtrl', function($scope, $rootScope, Helper, Reporting, Fetch) {
 	$scope.now = new Date().getTime();
 	$scope.init = function( time, stamp ) {
@@ -131,12 +285,11 @@ angular.module('main.controllers', [])
 			for( var key in val )
 			{
 				for( var gl in val[key] ) {
-					console.log(gl);
 					$scope.glcodes.push(gl);
 					if( gl[0] == "2" || gl[0] == "3" || gl[0] == "5" || gl == "9001" )
-						$scope.amounts.push(-1 * parseInt(val[key][gl]));
+						$scope.amounts.push(Helper.accountify(-1 * parseInt(val[key][gl])));
 					else
-						$scope.amounts.push(parseInt(val[key][gl]));
+						$scope.amounts.push(Helper.accountify(parseInt(val[key][gl])));
 				}
 			}
 		});

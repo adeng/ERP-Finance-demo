@@ -42,6 +42,15 @@ angular.module('main.services', [])
 				deferred.resolve(accounts);
 			});
 			return deferred.promise;
+		},
+		accountify: function( str ){
+			var num = (typeof str == "number") ? str : parseFloat(str);
+			if( num == 0 )
+				return " -- ";
+			var parts = (''+(num<0?-num:num)).split("."), s=parts[0], i=L= s.length, o='',c;
+			while(i--){ o = (i==0?'':((L-i)%3?'':',')) 
+			              +s.charAt(i) +o }
+			return (num<0?'(':'') + o + num.toFixed(2).slice(-3) + (num<0?')':''); 
 		}
 	}
 })
@@ -149,7 +158,7 @@ angular.module('main.services', [])
 
 					// ensure new accounts are added properly
 					for( var key in snap ) {
-						if( !isNaN(parseInt(key)) )
+						if( !isNaN(parseInt(key)) && parseInt(key[0]) < 5 )
 							record[key] = snap[key];
 					}
 					
@@ -203,7 +212,7 @@ angular.module('main.services', [])
 				lastSnap.$loaded().then( function( snap ) {
 					// ensure new accounts are added properly
 					for( var key in snap ) {
-						if( !isNaN(parseInt(key)) )
+						if( !isNaN(parseInt(key)) && parseInt(key[0]) < 5 )
 							record[key] = snap[key];
 					}
 					

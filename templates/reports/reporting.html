@@ -1,0 +1,31 @@
+<div ng-controller="ReportingCtrl">
+	<ol class="breadcrumb">
+		<li><a href="#" ng-click="navigate('home')">Home</a></li>
+		<li class="active">Reporting</li>
+	</ol><br />
+	
+	<!-- Jumbotron -->
+	<div class="jumbotron">
+		<h1>Financial Reporting</h1>
+		<p class="lead">View all financial reports here!</p>
+	</div>
+	
+	<!-- Example row of columns -->
+	<div class="row">
+		<div class="col-lg-4">
+			<h2>Trial Balance</h2>
+			<p>This is a raw data dump of all current financial balances. Not the easiest to read but useful for diagonostic purposes.</p>
+			<p><a class="btn btn-primary" href="#" role="button" ng-click="navigate('trial')">View details &raquo;</a></p>
+		</div>
+		<div class="col-lg-4">
+			<h2>Income Statement</h2>
+			<p>This is a report of the revenues and expenses generated over the selected period. </p>
+			<p><a class="btn btn-primary" href="#" role="button" ng-click="navigate('incomestatement')">View details &raquo;</a></p>
+		</div>
+		<div class="col-lg-4">
+			<h2>Balance Sheet</h2>
+			<p>This is a snapshot of all assets, liabilities, and equity accounts at the end of the selected period. </p>
+			<p><a class="btn btn-primary" href="#" role="button" ng-click="navigate('balancesheet')">View details &raquo;</a></p>
+		</div>
+	</div>
+</div>

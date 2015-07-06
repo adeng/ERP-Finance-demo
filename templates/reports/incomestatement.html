@@ -1,0 +1,75 @@
+<style>
+	.tincome th:nth-child(1) {
+		width: 90%;
+	}
+	
+	.tincome th:nth-child(2) {
+		width: 10%;
+	}
+	
+	.tinline td:first-child {
+		padding-left: 2.5vw;
+	}
+</style>
+
+<div ng-controller="IncomeStatementCtrl">
+	<ol class="breadcrumb">
+		<li><a href="#" ng-click="navigate('home')">Home</a></li>
+		<li><a href="#" ng-click="navigate('reporting')">Reporting</a></li>
+		<li class="active">Income Statement</li>
+	</ol><br />
+	
+	<h1 class="page-header">Income Statement</h1>
+	
+	<ul class="nav nav-tabs">
+		<li role="presentation" ng-class="{'active': curr == '0'}" ng-click="init(now, 0)"><a href="#">Current Period QTD</a></li>
+		<li role="presentation" ng-class="{'active': curr == ($index + 1)}" ng-repeat="quarter in quarters" ng-click="init(quarter, $index + 1)"><a href="#">{{toDateString(quarter)}}</a></li>
+	</ul><br />
+	
+	<table class="table table-hover tincome">
+		<thead>
+			<tr>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-if="revenues.length > 0">
+				<th><b>Operating Revenues</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="revenue in revenues" ng-if="revenues.length > 0" class="tinline">
+				<td>{{codes[revenue.desc]}}</td>
+				<td>{{revenue.amount}}</td>
+			</tr>
+			<tr ng-if="expenses.length > 0">
+				<th><b>Operating Expenses</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="expense in expenses" ng-if="expenses.length > 0" class="tinline">
+				<td>{{codes[expense.desc]}}</td>
+				<td>{{expense.amount}}</td>
+			</tr>
+			<tr ng-if="others.length > 0">
+				<th><b>Other Revenues/Expenses</b></th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="other in others" ng-if="others.length > 0" class="tinline">
+				<td>{{codes[other.desc]}}</td>
+				<td>{{other.amount}}</td>
+			</tr>
+			<tr>
+				<th><b>Income Before Taxes</b></th>
+				<th>{{incomeBeforeTax}}</th>
+			</tr>
+			<tr class="tinline">
+				<td>Provision for Income Taxes</td>
+				<td>{{tax}}</td>
+			</tr>
+			<tr>
+				<th><b>Net Income</b></th>
+				<th>{{netIncome}}</th>
+			</tr>
+		</tbody>
+	</table>
+</div>
