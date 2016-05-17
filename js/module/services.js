@@ -21,7 +21,7 @@ angular.module('main.services', [])
 				snaps.forEach(function(x, time) {
 					quarters.push(getQuarter(time));
 				});
-				deferred.resolve(quarters);
+				deferred.resolve(quarters.sort().reverse()); // newest quarter first
 			});
 			return deferred.promise;
 		},
