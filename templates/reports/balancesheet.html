@@ -23,7 +23,7 @@
 	
 	<ul class="nav nav-tabs">
 		<li role="presentation" ng-class="{'active': curr == '0'}" ng-click="init(now, 0)"><a href="#">Current Period QTD</a></li>
-		<li role="presentation" ng-class="{'active': curr == ($index + 1)}" ng-repeat="quarter in quarters" ng-click="init(quarter, $index + 1)"><a href="#">{{toDateString(quarter)}}</a></li>
+		<li role="presentation" ng-class="{'active': curr == ($index + 1)}" ng-repeat="quarter in quarters track by $index" ng-click="init(quarter, $index + 1)"><a href="#">{{toDateString(quarter)}}</a></li>
 	</ul><br />
 	
 	<table class="table table-hover tsheet">
